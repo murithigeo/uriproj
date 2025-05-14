@@ -1,8 +1,8 @@
-import assert from 'assert'
+import assert from 'node:assert'
 import {assertAlmostEqual} from './util.js'
 import * as uriproj from '../src'
 import proj4 from 'proj4'
-
+import {describe,it} from "node:test"
 const ROOT_PREFIX = 'http://www.opengis.net/def/crs/'
 const OGC_PREFIX = ROOT_PREFIX + 'OGC/'
 const EPSG_PREFIX = ROOT_PREFIX + 'EPSG/0/'

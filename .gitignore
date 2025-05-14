@@ -8,3 +8,4 @@
 /uriproj.*
 lcov.info
 /package-lock.json
+index.d.ts
