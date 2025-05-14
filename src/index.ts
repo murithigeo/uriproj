@@ -100,17 +100,19 @@ export function set(
   proj: Projection | string,
   options: { reverseAxes?: boolean } = { reverseAxes: false }
 ) {
-  if (typeof proj === "object") {
-    projCache[crsUri] = proj;
-    return proj;
+  let projobj: Projection;
+  if (typeof proj === "string") {
+    projobj = proj4(proj);
+    if (!projobj) {
+      throw new Error(`Unsupported proj4 string: ${proj}`);
+    }
+    proj4.defs(crsUri, proj);
+    if (options.reverseAxes) {
+      projobj = reverseAxes(projobj);
+    }
+  } else {
+    projobj = proj;
   }
-
-  let projobj: Projection = proj4(proj);
-
-  if (!projobj) throw Error(`Unsupported proj4 string: ${proj}`);
-
-  proj4.defs(crsUri, proj);
-  if (options.reverseAxes) projobj = reverseAxes(projobj);
   projCache[crsUri] = projobj;
   return projobj;
 }
