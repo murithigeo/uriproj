@@ -16,7 +16,7 @@ const outputCfgs = [
 export default defineConfig({
   input: "src/index.ts",
   plugins: [
-    typescript({outDir:"./"}),
+    typescript({declarationDir:"./lib/types"}),
     nodeResolve({ browser: true }),
     commonjs({ include: "node_modules/**" }),
     babel({ babelHelpers: "bundled" }),
