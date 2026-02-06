@@ -1,0 +1,51 @@
+{
+  "name": "@murithigeo/uriproj",
+  "version": "0.2.0",
+  "description": "A fork of uriproj, by Reading eScience Center, that has type safety and allows use of short uris",
+  "keywords": [
+    "uriproj",
+    "proj4"
+  ],
+  "homepage": "https://github.com/murithigeo/uriproj#readme",
+  "bugs": {
+    "url": "https://github.com/murithigeo/uriproj/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/murithigeo/uriproj.git"
+  },
+  "license": "BSD-3-Clause",
+  "author": "murithigeo",
+  "type": "module",
+  "main": "src/index.ts",
+  "directories": {
+    "test": "tests",
+    "lib": "src"
+  },
+  "exports": {
+    "import": "./dist/uriproj.cjs.js",
+    "require": "./dist/uriproj.esm.js"
+  },
+  "types": "./dist/uriproj.d.ts",
+  "module": "src/index.ts",
+  "scripts": {
+    "test": "playwright test",
+    "build": "rollup -c"
+  },
+  "dependencies": {
+    "proj4": "^2.20.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
+    "@types/node": "^25.2.0",
+    "rollup": "^4.57.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3"
+  },
+  "files": [
+    "src/",
+    "dist/"
+  ]
+}
