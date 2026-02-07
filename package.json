@@ -1,10 +1,11 @@
 {
   "name": "@murithigeo/uriproj",
-  "version": "0.2.0",
-  "description": "A fork of uriproj, by Reading eScience Center, that has type safety and allows use of short uris",
+  "version": "0.2.6",
+  "description": "Basically uriproj by Reading eScience Center but includes support for URNs and shorthand prefixes",
   "keywords": [
     "uriproj",
-    "proj4"
+    "proj4",
+    "crs"
   ],
   "homepage": "https://github.com/murithigeo/uriproj#readme",
   "bugs": {
@@ -12,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/murithigeo/uriproj.git"
+    "url": "git+https://github.com/murithigeo/uriproj.git"
   },
   "license": "BSD-3-Clause",
   "author": "murithigeo",
@@ -22,15 +23,12 @@
     "test": "tests",
     "lib": "src"
   },
-  "exports": {
-    "import": "./dist/uriproj.cjs.js",
-    "require": "./dist/uriproj.esm.js"
-  },
-  "types": "./dist/uriproj.d.ts",
+  "types": "dist/index.d.ts",
   "module": "src/index.ts",
   "scripts": {
     "test": "playwright test",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "prepublish": "npm run build"
   },
   "dependencies": {
     "proj4": "^2.20.2"

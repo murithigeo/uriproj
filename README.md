@@ -17,25 +17,47 @@ Some mechanisms have changed:
 
 Promise=>then syntax
 
-``` ts
-    uriproj.load(`http://www.opengis.net/def/crs/OGC/1.3/CRS84`).then(proj=>proj.forward([36,1],true))
+```ts
+uriproj
+  .load(`http://www.opengis.net/def/crs/OGC/1.3/CRS84`)
+  .then((proj) => proj.forward([36, 1], true));
 ```
 
 Promise=>await
 
-``` ts
- const proj=await uriproj.reproject(`http://www.opengis.net/def/crs/OGC/1.3/CRS84`);
- const [x,y]=proj.forward([36,1],true);
+```ts
+const proj = await uriproj.reproject(
+  `http://www.opengis.net/def/crs/OGC/1.3/CRS84`,
+);
+const [x, y] = proj.forward([36, 1], true);
 ```
 
 Target and Source
 If the source is omitted, then the source defaults to EPSG:4326 shipped with proj4
 
-``` ts
-const source="EPSG:4326";
-const target="OGC:CRS84";
-const [lat,lon]=[-180,-90]
-const proj=await uriproj(target,source);
-const [x,y]=proj.forward([lat,lon],true);
+```ts
+const source = "EPSG:4326";
+const target = "OGC:CRS84";
+const [lat, lon] = [-180, -90];
+const proj = await uriproj(target, source);
+const [x, y] = proj.forward([lat, lon], true);
 //-90,-180
+```
+
+For browser use, remember to load proj4 first using
+
+```html
+<script type src="https://cdn.jsdelivr.net/npm/proj4@2.20.2/dist/proj4.js">
+```
+
+Then you can use the esm module for modern browsers
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@murithigeo/uriproj@0.2.5/dist/uriproj.esm.min.js">
+```
+
+or use an iife
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/npm/@murithigeo/uriproj@0.2.5/dist/uriproj.browser.min.js">
 ```

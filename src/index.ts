@@ -1,12 +1,13 @@
 import proj4 from "proj4";
-
+import type { Converter } from "proj4";
+export type { Converter };
 /**
  * @description the keys of the cache are absolute uris
  */
 const cache: Record<string, string> = {};
 
-const ROOT_PREFIX = `http://www.opengis.net/def/crs`;
-
+const URI_ROOT_PREFIX = `http://www.opengis.net/def/crs`;
+const URN_ROOT_PREFIX = `urn:ogc:def:crs`;
 export function get(crsUri: string): string | undefined {
   return cache[crsUri];
 }
@@ -37,10 +38,13 @@ export async function load(crsUri: string): Promise<string> {
  * @description return a auth:code string
  */
 export function parseCrsId(crsuri: string): string {
-  if (crsuri.indexOf(ROOT_PREFIX) !== -1) return uriToAuthCode(crsuri);
+  if (crsuri.indexOf(URI_ROOT_PREFIX) === 0) return uriToAuthCode(crsuri);
+  if (crsuri.indexOf(URN_ROOT_PREFIX) === 0)
+    return uriToAuthCode(urnToUri(crsuri));
   if (crsuri.split(":").length === 2) return crsuri;
-  if (crsuri.split(":").length === 7) return uriToAuthCode(urnToUri(crsuri));
-  throw Error(`Invalid syntax`);
+  throw Error(
+    `crs identifier must either be a shorthand, an OGC CRS URI or an OGC CRS URN:${crsuri}`,
+  );
 }
 
 /**
@@ -50,9 +54,9 @@ export function parseCrsId(crsuri: string): string {
  * http://www.opengis.net/def/crs/OGC/1.3/CRS84 -> OGC:CRS84
  */
 export function uriToAuthCode(crsuri: string): string {
-  if (crsuri.indexOf(ROOT_PREFIX) === -1)
+  if (crsuri.indexOf(URI_ROOT_PREFIX) === -1)
     throw Error(`Unsupported CRS URI:${crsuri}`);
-  let [, auth, , code] = crsuri.substring(ROOT_PREFIX.length).split("/");
+  let [, auth, , code] = crsuri.substring(URI_ROOT_PREFIX.length).split("/");
   return `${auth}:${code}`;
 }
 
@@ -62,7 +66,7 @@ export function authCodeToUri(authCode: string): string {
     throw Error(`Invalid syntax. Should be <authority>:<code>`);
   let version = 0;
   if (parts[1] === "CRS84") version = 1.3;
-  return `${ROOT_PREFIX}/${parts[0]}/${version}/${parts[1]}`;
+  return `${URI_ROOT_PREFIX}/${parts[0]}/${version}/${parts[1]}`;
 }
 
 /**
@@ -70,8 +74,12 @@ export function authCodeToUri(authCode: string): string {
  * @param uri a deprecated urn identifier @example urn:ogc:def:crs:EPSG:6.3:26986
  */
 export function urnToUri(urn: string): string {
-  const [, , , , authority, version, code] = urn.split(":");
-  return `${ROOT_PREFIX}/${authority}/${version}/${code}`;
+  if (urn.indexOf(URN_ROOT_PREFIX) === -1)
+    throw Error(`Invalid OGC URN: ${urn}`);
+  const [, authority, version, code] = urn
+    .substring(URN_ROOT_PREFIX.length)
+    .split(":");
+  return `${URI_ROOT_PREFIX}/${authority}/${version}/${code}`;
 }
 
 /**
@@ -79,7 +87,10 @@ export function urnToUri(urn: string): string {
  * @param from When a second argument is not provided, this will default to proj4's inbuilt EPSG:4326
  * @param to the crs to project the coordinates to
  */
-export async function uriproj(to: string, from: string | undefined) {
+export async function uriproj(
+  to: string,
+  from: string | undefined,
+): Promise<Converter> {
   if (from === undefined) return proj4(await load(to));
   return proj4(await load(from), await load(to));
 }
