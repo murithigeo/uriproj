@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["ES5"],
+    "lib": ["ES2015"],
     "esModuleInterop": true,
     "declaration": true,
     "declarationDir": "./dist"

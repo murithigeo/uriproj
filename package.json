@@ -1,6 +1,6 @@
 {
   "name": "@murithigeo/uriproj",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Basically uriproj by Reading eScience Center but includes support for URNs and shorthand prefixes",
   "keywords": [
     "uriproj",
@@ -18,13 +18,12 @@
   "license": "BSD-3-Clause",
   "author": "murithigeo",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "dist/uriproj.js",
   "directories": {
     "test": "tests",
     "lib": "src"
   },
   "types": "dist/index.d.ts",
-  "module": "src/index.ts",
   "scripts": {
     "test": "playwright test",
     "build": "rollup -c",
@@ -35,6 +34,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.1",
+    "@rollup/plugin-babel": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^25.2.0",
