@@ -95,7 +95,7 @@ export function fromAuthCode(val: string) {
  * @param from When a second argument is not provided, this will default to proj4's inbuilt EPSG:4326
  * @param to the crs to project the coordinates to
  */
-export async function converter(args: {
+export async function uriproj(args: {
   from?: string;
   to: string;
 }): Promise<Converter> {
