@@ -30,7 +30,7 @@
     "prepublish": "npm run build"
   },
   "dependencies": {
-    "proj4": "^2.20.2"
+    "proj4": "^2.20.8"
   },
   "devDependencies": {
     "@rollup/plugin-babel": "^6.1.0",

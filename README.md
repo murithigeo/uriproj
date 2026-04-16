@@ -1,63 +1,91 @@
-# @murithigeo/uriproj
+# URIProj
 
-This is an offshot of the project uriproj by letmaik and the Reading eScience Center. Due to the nature of the project, I have decided to publish my own with some features I'd like to use and promote use.
+A TypeScript wrapper for loading remote CRS WKT definitions and extends the original [uriproj](https://github.com/reading-escience/uriproj) by adding support for URNs and shorthand prefixes, making it easier to work with different CRS formats.
 
-### Changes
+## Features
 
-Some mechanisms have changed:
+- Supports specifying OGC URNs, URIs and <authority>:<code> shorthands
+- Uses OGC WKT2 definitions eliminating need for NADGRID TIFF files
+- Caches definitions
 
-1. The projection text is now sourced from `https://spatialreference.org` instead of `https://epsg.io` because their CRS WKTs are somewhat incomplete resulting in issues such as [Missing Nagrid Buffers](https://github.com/Reading-eScience-Centre/uriproj/issues/4)
-2. EPSG:4326 will not use the EPSG:4326 definition shipped with proj4. This is because that definition is not axis aware resulting in incorrect coordinates.
-3. You can load CRS Ids formatted as OGC URNs such as `urn:ogc:def:crs:EPSG:6.3:26986` deprecated or shorthand strings such as `EPSG:4326`. These will be reformatted into absolute OGC CRS URIs
-4. Dissimilar to how uriproj stored the Converter function, this project stores the projection wkt string instead. This is because once loaded, proj4 wont accept the converter function when you try to project from one crs to another
-5. The version is ommitted from the request because Spatial Reference does not support versioning. This is not a breaking change because neither does EPSG
-6. This is intended to be an ES module. It has a default export
+## Installation
 
-### Loading
+```bash
+npm install @murithigeo/uriproj
+```
 
-Promise=>then syntax
+## Quick Start
+
+```typescript
+import { uriproj, load, fromAuthCode, toURI } from "@murithigeo/uriproj";
+
+// Project coordinates from EPSG:4326 to OGC:CRS84
+const converter = await uriproj({
+  from: "EPSG:4326",
+  to: "OGC:CRS84",
+});
+
+const projected = converter.forward({ x: -90, y: -180 });
+console.log(projected); // { x: -180, y: -90 }
+```
+
+## API Documentation
+
+### Formats
+
+URIProj supports three CRS identifier formats:
+
+1. **Authority:Code** (shorthand): `EPSG:4326`, `OGC:CRS84`
+2. **URI**: `http://www.opengis.net/def/crs/EPSG/0/4326`
+3. **URN**: `urn:ogc:def:crs:EPSG:0:4326`
+
+The `fromURI`, `fromURN` and `fromAuthCode` functions allow conversions to other formats
+
+The `toURI` allows conversions from an unknown string to an absolute URI
+
+### Loading a remote WKT definition
+
+Loads a CRS definition from spatialreference.org and caches it locally. Automatically registers the definition with proj4. Accepts any supported CRS format.
+
+```typescript
+import { load } from "@murithigeo/uriproj";
+
+let wkt = await load("EPSG:4326");
+wkt = await load("urn:ogc:def:crs:OGC:1.3:CRS84");
+wkt = await load("http://www.opengis.net/def/crs/EPSG/0/4326");
+
+console.log(wkt);
+```
+
+### Retrieving a cached definition
+
+Retrieve a cached CRS definition.
+
+```typescript
+import { get } from "@murithigeo/uriproj";
+
+const cached = get("http://www.opengis.net/def/crs/EPSG/0/4326");
+if (cached) {
+  console.log("CRS definition is cached:", cached);
+}
+```
+
+### Getting the Converter function
 
 ```ts
-uriproj
-  .load(`http://www.opengis.net/def/crs/OGC/1.3/CRS84`)
-  .then((proj) => proj.forward([36, 1], true));
+const converter = await uriproj({
+  from: "OGC:CRS84", // If undefined, defaults to EPSG:4326
+  to: "EPSG:32737",
+});
 ```
 
-Promise=>await
+### Re-exported from proj4
 
-```ts
-const proj = await uriproj.reproject(
-  `http://www.opengis.net/def/crs/OGC/1.3/CRS84`,
-);
-const [x, y] = proj.forward([36, 1], true);
-```
+Both `proj4` and the `Converter` type are re-exported for convenience:
 
-Target and Source
-If the source is omitted, then the source defaults to EPSG:4326 shipped with proj4
+```typescript
+import { proj4, type Converter } from "@murithigeo/uriproj";
 
-```ts
-const source = "EPSG:4326";
-const target = "OGC:CRS84";
-const [lat, lon] = [-180, -90];
-const proj = await uriproj(target, source);
-const [x, y] = proj.forward([lat, lon], true);
-//-90,-180
-```
-
-For browser use, remember to load proj4 first using
-
-```html
-<script type src="https://cdn.jsdelivr.net/npm/proj4@2.20.2/dist/proj4.js">
-```
-
-Then you can use the esm module for modern browsers
-
-```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@murithigeo/uriproj@0.2.5/dist/uriproj.esm.min.js">
-```
-
-or use an iife
-
-```html
-<script type="module" src="https://cdn.jsdelivr.net/npm/@murithigeo/uriproj@0.2.5/dist/uriproj.browser.min.js">
+// Use proj4 directly if needed
+proj4.defs("EPSG:4326");
 ```
